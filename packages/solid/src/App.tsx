@@ -24,13 +24,41 @@ if (import.meta.hot) {
   });
 }
 
+const [title, setTitle] = createSignal("");
+
+bus.on("twitch.channel.update", (properties) => {
+  setTitle(properties.title);
+});
+
 const App: Component = () => {
-  const [scene, setScene] = createSignal<"Code" | "Camera" | "Waiting">();
+  const [scene, setScene] = createSignal<
+    "Code" | "Camera" | "Waiting" | "Zuko"
+  >("Waiting");
+
+  if (window.obsstudio)
+    window.obsstudio.getCurrentScene((scene) => {
+      setScene(scene.name as any);
+    });
 
   createEventListener(window, "obsSceneChanged", (event) => {
     const evt = event as Event & CustomEvent<OBSSceneInfo>;
     setScene(evt.detail.name as any);
   });
+
+  const rewards = createQueue();
+  bus.on(
+    "twitch.channel.channel_points_custom_reward_redemption.add",
+    (props) => {
+      if (props.reward.title === "Zuko Cam") {
+        rewards.add(async () => {
+          const old = scene();
+          window.obsstudio.setCurrentScene("Zuko");
+          await new Promise((r) => setTimeout(r, 1000 * 8));
+          window.obsstudio.setCurrentScene(old!);
+        });
+      }
+    }
+  );
 
   return (
     <>
@@ -38,16 +66,43 @@ const App: Component = () => {
         <Match when={scene() === "Waiting"}>
           <Waiting />
         </Match>
+        <Match when={scene() === "Zuko"}>
+          <Zuko />
+        </Match>
       </Switch>
       <Notifications />
     </>
   );
 };
 
+import WOLVES_WAV from "./assets/wolves.wav";
+function Zuko() {
+  const [show, setShow] = createSignal(false);
+  const wolves = new Audio(WOLVES_WAV);
+  wolves.play();
+
+  setTimeout(() => {
+    setShow(true);
+  }, 1000);
+
+  return (
+    <div
+      classList={{
+        "opacity-0": show(),
+      }}
+      class="bg-[black] absolute inset-0 transition-all duration-500 text-white justify-center items-center flex text-[200px] font-extrabold uppercase tracking-[40px]"
+    >
+      Zuko Cam
+    </div>
+  );
+}
+
 import PARIS_WAV from "./assets/paris.wav";
 import { Events } from "../../core/src/realtime";
+import { Properties } from "solid-js/web";
 
 type QueueCallback = () => Promise<void>;
+
 function createQueue() {
   const queue = new Array<QueueCallback>();
 
@@ -113,7 +168,7 @@ function Notifications() {
 }
 
 function Waiting() {
-  const DURATION = 1000 * 60 * 17;
+  const DURATION = 1000 * 60 * 7;
   const [diff, setDiff] = createSignal(DURATION);
   const minutes = createMemo(() =>
     Math.floor(diff() / 60000)
@@ -167,7 +222,7 @@ function Waiting() {
         </div>
         <div class="text-white flex font-bold justify-center text-[40px] uppercase tracking-[10px]">
           <div class="flex items-center gap-8">
-            <div>building twitch stuff on twitch</div>
+            <div>{title()}</div>
           </div>
         </div>
       </div>

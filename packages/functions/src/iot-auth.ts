@@ -1,5 +1,5 @@
-export function handler(evt: any) {
-  return {
+export async function handler() {
+  const policy = {
     isAuthenticated: true, //A Boolean that determines whether client can connect.
     principalId: Date.now().toString(), //A string that identifies the connection in logs.
     disconnectAfterInSeconds: 86400,
@@ -32,4 +32,6 @@ export function handler(evt: any) {
       },
     ],
   };
+  console.log("Policy", JSON.stringify(policy, null, 2));
+  return policy;
 }

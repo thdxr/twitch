@@ -8,11 +8,11 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
-    "sst": "^2.1.24",
+    "sst": "2.2.4",
     "vitest": "^0.29.2"
   },
   "dependencies": {
     "@aws-sdk/client-iot-data-plane": "^3.289.0",
-    "sst": "^2.1.24"
+    "sst": "2.2.4"
   }
 }

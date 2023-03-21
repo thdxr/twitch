@@ -19,6 +19,16 @@ export interface Events {
   "twitch.channel.subscribe": {
     test: string;
   };
+  "twitch.channel.channel_points_custom_reward_redemption.add": {
+    user_id: string;
+    user_login: string;
+    reward: {
+      title: string;
+    };
+  };
+  "twitch.channel.update": {
+    title: string;
+  };
 }
 
 export function publish<T extends keyof Events>(

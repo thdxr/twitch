@@ -1,0 +1,10 @@
+{
+  "hosted-zone:account=280826753141:domainName=dev.thdxr.com:region=us-east-1": {
+    "Id": "/hostedzone/Z0342608ZG0PG9163QS",
+    "Name": "dev.thdxr.com."
+  },
+  "hosted-zone:account=435146552667:domainName=thdxr.com:region=us-east-1": {
+    "Id": "/hostedzone/Z0570507JUXJ2KGX5XSN",
+    "Name": "thdxr.com."
+  }
+}

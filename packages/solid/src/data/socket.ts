@@ -28,7 +28,7 @@ const connection = client.new_connection(config);
 
 export const bus = createEmitter<Events>();
 
-connection.on("connect", async () => {});
+connection.on("connect", console.log);
 connection.on("interrupt", console.log);
 connection.on("error", console.log);
 connection.on("resume", console.log);

@@ -9,10 +9,13 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.111",
     "@types/node": "^18.15.0",
-    "sst": "^2.1.24"
+    "sst": "2.2.4"
   },
   "dependencies": {
     "@aws-sdk/client-iot-data-plane": "^3.289.0",
-    "sst": "^2.1.24"
+    "@twurple/api": "^6.0.9",
+    "@twurple/auth": "^6.0.9",
+    "openid-client": "^5.4.0",
+    "sst": "2.2.4"
   }
 }
