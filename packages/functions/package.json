@@ -9,13 +9,17 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.111",
     "@types/node": "^18.15.0",
-    "sst": "2.2.4"
+    "sst": "2.8.28"
   },
   "dependencies": {
     "@aws-sdk/client-iot-data-plane": "^3.289.0",
+    "@aws-sdk/client-s3": "^3.337.0",
+    "@spotify/web-api-ts-sdk": "^0.0.20",
     "@twurple/api": "^6.0.9",
     "@twurple/auth": "^6.0.9",
     "openid-client": "^5.4.0",
-    "sst": "2.2.4"
+    "spotify-api.js": "^9.2.5",
+    "sst": "2.8.28",
+    "undici": "^5.22.1"
   }
 }

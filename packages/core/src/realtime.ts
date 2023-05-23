@@ -22,6 +22,7 @@ export interface Events {
   "twitch.channel.channel_points_custom_reward_redemption.add": {
     user_id: string;
     user_login: string;
+    user_input: string;
     reward: {
       title: string;
     };
@@ -31,6 +32,13 @@ export interface Events {
   };
 }
 
+export type Payloads = {
+  [key in keyof Events]: {
+    type: key;
+    properties: Events[key];
+  };
+}[keyof Events];
+
 export function publish<T extends keyof Events>(
   type: T,
   properties: Events[T]
@@ -39,11 +47,12 @@ export function publish<T extends keyof Events>(
     type: type,
     properties,
   };
-  console.log("Publishing", payload);
+  const topic = `${Config.APP}/${Config.STAGE}/${type}`;
+  console.log("Publishing", payload, "to", topic);
   return client.send(
     new PublishCommand({
       payload: Buffer.from(JSON.stringify(payload)),
-      topic: `${Config.APP}/${Config.STAGE}/${type}`,
+      topic,
     })
   );
 }

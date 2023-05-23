@@ -1,7 +1,7 @@
 import { SSTConfig } from "sst";
-import { Api, Config, Function, StaticSite } from "sst/constructs";
+import { Bucket, Api, Config, Function, StaticSite } from "sst/constructs";
 import { Auth } from "sst/constructs/future";
-import { CfnAuthorizer } from "aws-cdk-lib/aws-iot";
+import { CfnAuthorizer, CfnTopicRule } from "aws-cdk-lib/aws-iot";
 import { ServicePrincipal } from "aws-cdk-lib/aws-iam";
 
 export default {
@@ -31,11 +31,15 @@ export default {
       const zone =
         ctx.app.stage === "production" ? "thdxr.com" : "dev.thdxr.com";
 
-      const twitch = Config.Secret.create(
+      const secrets = Config.Secret.create(
         ctx.stack,
         "TWITCH_CLIENT_ID",
-        "TWITCH_CLIENT_SECRET"
+        "TWITCH_CLIENT_SECRET",
+        "SPOTIFY_CLIENT_ID",
+        "SPOTIFY_CLIENT_SECRET"
       );
+
+      const bucket = new Bucket(ctx.stack, "bucket");
 
       const api = new Api(ctx.stack, "api", {
         routes: {
@@ -51,7 +55,14 @@ export default {
       const auth = new Auth(ctx.stack, "auth", {
         authenticator: {
           handler: "packages/functions/src/auth.handler",
-          bind: [twitch.TWITCH_CLIENT_ID, twitch.TWITCH_CLIENT_SECRET, api],
+          bind: [
+            secrets.TWITCH_CLIENT_ID,
+            secrets.TWITCH_CLIENT_SECRET,
+            secrets.SPOTIFY_CLIENT_ID,
+            secrets.SPOTIFY_CLIENT_SECRET,
+            api,
+            bucket,
+          ],
           nodejs: {
             install: ["@twurple/auth", "@twurple/api"],
           },
@@ -93,6 +104,29 @@ export default {
         },
         environment: {
           VITE_STAGE: ctx.app.stage,
+        },
+      });
+
+      const eventHandler = new Function(ctx.stack, "event-handler", {
+        handler: "./packages/functions/src/iot-event.handler",
+        bind: [
+          secrets.SPOTIFY_CLIENT_ID,
+          secrets.SPOTIFY_CLIENT_SECRET,
+          bucket,
+        ],
+      });
+      eventHandler.grantInvoke(new ServicePrincipal("iot.amazonaws.com"));
+
+      new CfnTopicRule(ctx.stack, "rule", {
+        topicRulePayload: {
+          sql: `SELECT * FROM '${ctx.app.name}/${ctx.app.stage}/#'`,
+          actions: [
+            {
+              lambda: {
+                functionArn: eventHandler.functionArn,
+              },
+            },
+          ],
         },
       });
     });
