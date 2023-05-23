@@ -2,8 +2,8 @@ import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSignal } from "solid-js";
 
 export const [scene, setScene] = createSignal<
-  "Code" | "Camera" | "Waiting" | "Zuko"
->("Waiting");
+  "Code" | "Camera" | "Intro" | "Zuko" | "Break"
+>("Intro");
 
 if (window.obsstudio)
   window.obsstudio.getCurrentScene((scene) => {

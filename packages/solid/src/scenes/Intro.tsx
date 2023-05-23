@@ -7,7 +7,7 @@ import {
 } from "solid-js";
 import { title } from "../data/twitch";
 
-export function Waiting() {
+export function Intro() {
   const DURATION = 1000 * 60 * 7;
   const [diff, setDiff] = createSignal(DURATION);
 
