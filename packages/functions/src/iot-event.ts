@@ -4,6 +4,8 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { Events, Payloads } from "@twitch/core/realtime";
+import { ApiClient } from "@twurple/api";
+import { AppTokenAuthProvider } from "@twurple/auth";
 import { Client } from "spotify-api.js";
 import { Bucket } from "sst/node/bucket";
 import { Config } from "sst/node/config";
@@ -58,6 +60,18 @@ export async function handler(evt: Payloads) {
           refresh_token: client.refreshMeta?.refreshToken,
         }),
       })
+    );
+    const twitch = new ApiClient({
+      authProvider: new AppTokenAuthProvider(
+        Config.TWITCH_CLIENT_ID,
+        Config.TWITCH_CLIENT_SECRET
+      ),
+    });
+    await twitch.channelPoints.updateRedemptionStatusByIds(
+      "171736472",
+      evt.properties.reward.id,
+      [evt.properties.id],
+      "FULFILLED"
     );
     console.log(played);
   }

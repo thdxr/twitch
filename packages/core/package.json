@@ -8,11 +8,12 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
-    "sst": "2.8.28",
+    "sst": "2.10.4",
     "vitest": "^0.29.2"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.338.0",
     "@aws-sdk/client-iot-data-plane": "^3.289.0",
-    "sst": "2.8.28"
+    "sst": "2.10.4"
   }
 }

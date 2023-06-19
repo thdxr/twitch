@@ -1,5 +1,12 @@
 import { SSTConfig } from "sst";
-import { Bucket, Api, Config, Function, StaticSite } from "sst/constructs";
+import {
+  Bucket,
+  Api,
+  Config,
+  Function,
+  StaticSite,
+  Table,
+} from "sst/constructs";
 import { Auth } from "sst/constructs/future";
 import { CfnAuthorizer, CfnTopicRule } from "aws-cdk-lib/aws-iot";
 import { ServicePrincipal } from "aws-cdk-lib/aws-iam";
@@ -27,9 +34,35 @@ export default {
         sourcemap: true,
       },
     });
+
     app.stack(function App(ctx) {
       const zone =
         ctx.app.stage === "production" ? "thdxr.com" : "dev.thdxr.com";
+
+      const table = new Table(ctx.stack, "data", {
+        fields: {
+          pk: "string",
+          sk: "string",
+          gsi1pk: "string",
+          gsi1sk: "string",
+          gsi2pk: "string",
+          gsi2sk: "string",
+        },
+        primaryIndex: {
+          partitionKey: "pk",
+          sortKey: "sk",
+        },
+        globalIndexes: {
+          gsi1: {
+            partitionKey: "gsi1pk",
+            sortKey: "gsi1sk",
+          },
+          gsi2: {
+            partitionKey: "gsi2pk",
+            sortKey: "gsi2sk",
+          },
+        },
+      });
 
       const secrets = Config.Secret.create(
         ctx.stack,
@@ -112,7 +145,10 @@ export default {
         bind: [
           secrets.SPOTIFY_CLIENT_ID,
           secrets.SPOTIFY_CLIENT_SECRET,
+          secrets.TWITCH_CLIENT_ID,
+          secrets.TWITCH_CLIENT_SECRET,
           bucket,
+          table,
         ],
       });
       eventHandler.grantInvoke(new ServicePrincipal("iot.amazonaws.com"));

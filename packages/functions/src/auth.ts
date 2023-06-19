@@ -20,6 +20,7 @@ export const handler = AuthHandler({
   }),
   onSuccess: async (input) => {
     if (input.provider === "twitch") {
+      console.log("success from twitch");
       const twitch = new ApiClient({
         authProvider: new AppTokenAuthProvider(
           Config.TWITCH_CLIENT_ID,
@@ -38,16 +39,18 @@ export const handler = AuthHandler({
       const callback = Api.api.url + "/hook/twitch";
       console.log("Using callback", callback);
       for (const [type, version] of types) {
-        if (
-          existing.data.find(
-            (sub) =>
-              sub._transport.method === "webhook" &&
-              sub._transport.callback === callback &&
-              sub.type === type
-          )
-        ) {
-          console.log("Subscription for " + type + " already exists");
-          continue;
+        const match = existing.data.find(
+          (sub) =>
+            sub._transport.method === "webhook" &&
+            sub._transport.callback === callback &&
+            sub.type === type
+        );
+        if (match) {
+          if (match.status === "enabled") {
+            console.log("Subscription for " + type + " already exists");
+            continue;
+          }
+          await twitch.eventSub.deleteSubscription(match.id);
         }
         await twitch.eventSub.createSubscription(
           type,
@@ -91,7 +94,7 @@ export const handler = AuthHandler({
       clientID: Config.TWITCH_CLIENT_ID,
       clientSecret: Config.TWITCH_CLIENT_SECRET,
       scope:
-        "user:read:follows channel:moderate chat:edit chat:read channel:read:redemptions",
+        "openid user:read:follows channel:moderate chat:edit chat:read channel:read:redemptions",
     }),
     spotify: OauthAdapter({
       clientID: Config.SPOTIFY_CLIENT_ID,

@@ -23,7 +23,9 @@ export interface Events {
     user_id: string;
     user_login: string;
     user_input: string;
+    id: string;
     reward: {
+      id: string;
       title: string;
     };
   };

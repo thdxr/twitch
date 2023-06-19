@@ -3,7 +3,7 @@ import { scene } from "../data/obs";
 
 export function Footer() {
   return (
-    <Show when={["Code", "Camera"].includes(scene()) || true}>
+    <Show when={["Code", "Camera"].includes(scene()) && false}>
       <div class="fixed h-20 bg-[#161618] text-lg text-[#ededef] bottom-0 left-0 right-0 flex items-center px-10 justify-between">
         <div>weekend bs</div>
         <div class="flex gap-4 items-center">
