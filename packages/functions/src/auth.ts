@@ -18,7 +18,7 @@ export const handler = AuthHandler({
   onError: async () => ({
     statusCode: 400,
   }),
-  onSuccess: async (input) => {
+  onSuccess: async (input, response) => {
     if (input.provider === "twitch") {
       console.log("success from twitch");
       const twitch = new ApiClient({
@@ -83,10 +83,10 @@ export const handler = AuthHandler({
       );
     }
 
-    return {
+    return response.session({
       type: "public",
       properties: {},
-    };
+    });
   },
   providers: {
     twitch: OauthAdapter({
